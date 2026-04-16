@@ -270,6 +270,84 @@
     .grid-2, .grid-3-2, .grid-2-3 { grid-template-columns: 1fr; }
     .phase2-status, .phase2-dims { grid-template-columns: 1fr; }
   }
+
+  /* ====== 手机适配（<=768px）====== */
+  @media (max-width: 768px) {
+    .hero { padding: 20px 16px 22px; }
+    .hero::after { width: 180px; height: 180px; right: -60px; top: -60px; }
+    .hero-top { flex-direction: column; gap: 12px; }
+    .hero h1 { font-size: 20px; letter-spacing: 0; }
+    .hero h1 .sep { margin: 0 6px; }
+    .hero .subtitle { font-size: 12px; line-height: 1.6; }
+    .hero .badges { flex-wrap: wrap; }
+    .badge { font-size: 11px; padding: 3px 10px; }
+    .hero-meta { text-align: left; font-size: 11px; line-height: 1.8; }
+
+    .tabs {
+      padding: 0 4px;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      flex-wrap: nowrap;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tabs { -ms-overflow-style: none; scrollbar-width: none; }
+    .tab {
+      padding: 13px 14px;
+      font-size: 13px;
+      flex-shrink: 0;
+      border-bottom-width: 2px;
+    }
+    .tab .count { font-size: 10px; padding: 1px 6px; margin-left: 4px; }
+
+    main { padding: 16px 12px 40px; }
+
+    .kpi-strip {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .kpi { padding: 13px 14px; border-radius: 8px; }
+    .kpi::before { left: 14px; top: 10px; width: 22px; height: 2px; }
+    .kpi-label { font-size: 11px; margin-top: 8px; }
+    .kpi-value { font-size: 20px; letter-spacing: -0.3px; }
+    .kpi-unit { font-size: 10px; }
+
+    .card { padding: 14px 14px 12px; border-radius: 8px; }
+    .card-title { font-size: 14px; }
+    .card-title::before { height: 12px; }
+    .card-sub { font-size: 11px; margin-bottom: 10px; margin-left: 11px; }
+
+    .chart { height: 300px; }
+    .chart.tall { height: 460px; }
+    .chart.short { height: 260px; }
+
+    .obs {
+      font-size: 12px;
+      padding: 12px 14px;
+      line-height: 1.9;
+      margin-bottom: 14px;
+    }
+    .obs .dot { margin: 0 6px; }
+    .warning {
+      font-size: 12px;
+      padding: 10px 12px;
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+    .warning::before { font-size: 16px; }
+
+    .grid { gap: 14px; margin-bottom: 14px; }
+
+    footer { padding: 16px 12px; font-size: 11px; }
+  }
+
+  /* 更窄（<=380px，老旧小屏）*/
+  @media (max-width: 380px) {
+    .hero h1 { font-size: 18px; }
+    .kpi-value { font-size: 18px; }
+    .tab { padding: 12px 11px; font-size: 12px; }
+  }
 </style>
 </head>
 <body>
@@ -297,7 +375,6 @@
   <div class="tab march active" data-panel="march"><span class="dot"></span>3 月销售</div>
   <div class="tab april" data-panel="april"><span class="dot"></span>4 月销售<span class="count">半月</span></div>
   <div class="tab" data-panel="trend">6 月趋势附录</div>
-  <div class="tab" data-panel="phase2">第二期预告</div>
 </div>
 
 <main>
@@ -434,27 +511,6 @@
       <div class="card-title">月度分品类堆积</div>
       <div class="card-sub">各月份品类构成</div>
       <div class="chart" id="trend-stack"></div>
-    </div>
-  </div>
-
-  <!-- ============ 第二期预告 PANEL ============ -->
-  <div class="panel" id="panel-phase2">
-    <h2 style="color:var(--navy);font-size:22px;margin-bottom:4px;">第二期预告：业务员维度分析</h2>
-    <p style="color:var(--text-soft);font-size:13px;margin-bottom:20px;">待内勤数据补充完成后开展</p>
-
-    <h3 style="font-size:15px;color:var(--navy);margin-bottom:10px;">当前匹配状态</h3>
-    <div class="phase2-status" id="phase2-status"></div>
-
-    <h3 style="font-size:15px;color:var(--navy);margin:10px 0;">第二期将新增分析维度</h3>
-    <div class="phase2-dims">
-      <div class="dim-card"><h3>业务员业绩榜</h3><p>按吨数 / 金额排名，跨品类综合贡献</p></div>
-      <div class="dim-card"><h3>业务员 × 品类矩阵</h3><p>看每位业务员的品类专长</p></div>
-      <div class="dim-card"><h3>客户-业务员对应关系</h3><p>完整的归属图谱</p></div>
-      <div class="dim-card"><h3>大客户业务员 TOP</h3><p>谁在服务关键客户</p></div>
-    </div>
-
-    <div class="nextstep">
-      ➜ 下一步：待内勤同事补充 <strong>《待匹配客户清单-待内勤填写_v2.xlsx》</strong> 后启动
     </div>
   </div>
 
@@ -937,6 +993,22 @@ const CAT_COLORS = { '纯碱': COLORS.navy, '尿素': COLORS.orange, '小苏打'
 
 const FONT = '"PingFang SC", "Microsoft YaHei", -apple-system, sans-serif';
 
+// ============ 响应式断点 ============
+const IS_MOBILE = () => window.innerWidth <= 768;
+
+// 所有已创建的 chart 实例（用于跨断点重渲染）
+const CHART_INSTANCES = [];
+function disposeAllCharts() {
+  while (CHART_INSTANCES.length) {
+    const inst = CHART_INSTANCES.pop();
+    try { inst.dispose(); } catch (e) {}
+  }
+}
+function registerChart(c) {
+  CHART_INSTANCES.push(c);
+  window.addEventListener('resize', () => c.resize());
+}
+
 // ============ Tab switching ============
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
@@ -1048,98 +1120,137 @@ function renderDonut(containerId, data, field, unit) {
       }]
     });
   }, 0);
-  window.addEventListener('resize', () => chart.resize());
+  registerChart(chart);
 }
 
 // ============ 分品类表现：三联柱 ============
 function renderCatPerf(containerId, data) {
-  const chart = echarts.init(document.getElementById(containerId));
+  const el = document.getElementById(containerId);
+  const mobile = IS_MOBILE();
+  // 手机端拉高容器，让三块纵向堆叠舒展
+  if (mobile) { el.style.height = '520px'; } else { el.style.height = ''; }
+
+  const chart = echarts.init(el);
   const cats = data.map(x => x.cat);
   const colors = cats.map(c => CAT_COLORS[c]);
 
+  const grids = mobile
+    ? [
+        { left: '14%', right: '6%', top: '6%',  bottom: '72%', containLabel: true },
+        { left: '14%', right: '6%', top: '38%', bottom: '40%', containLabel: true },
+        { left: '14%', right: '6%', top: '70%', bottom: '8%',  containLabel: true }
+      ]
+    : [
+        { left: '4%',  right: '70%', top: '18%', bottom: '14%', containLabel: true },
+        { left: '36%', right: '36%', top: '18%', bottom: '14%', containLabel: true },
+        { left: '70%', right: '4%',  top: '18%', bottom: '14%', containLabel: true }
+      ];
+
+  const titles = mobile
+    ? [
+        { text: '发货吨数', left: 'center', top: '1%',  textStyle: { fontSize: 12, fontFamily: FONT, color: COLORS.navy, fontWeight: 700 } },
+        { text: '出库金额（万元）', left: 'center', top: '33%', textStyle: { fontSize: 12, fontFamily: FONT, color: COLORS.navy, fontWeight: 700 } },
+        { text: '加权均价（元/吨）', left: 'center', top: '65%', textStyle: { fontSize: 12, fontFamily: FONT, color: COLORS.navy, fontWeight: 700 } }
+      ]
+    : [
+        { text: '发货吨数', left: '17%', top: '3%', textStyle: { fontSize: 13, fontFamily: FONT, color: COLORS.navy } },
+        { text: '出库金额（万元）', left: '50%', top: '3%', textAlign: 'center', textStyle: { fontSize: 13, fontFamily: FONT, color: COLORS.navy } },
+        { text: '加权均价（元/吨）', left: '83%', top: '3%', textAlign: 'center', textStyle: { fontSize: 13, fontFamily: FONT, color: COLORS.navy } }
+      ];
+
+  const axisFs = mobile ? 11 : 12;
+  const yFs = mobile ? 10 : 11;
+
   chart.setOption({
-    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, textStyle: { fontFamily: FONT } },
-    grid: [
-      { left: '4%', right: '70%', top: '18%', bottom: '14%', containLabel: true },
-      { left: '36%', right: '36%', top: '18%', bottom: '14%', containLabel: true },
-      { left: '70%', right: '4%', top: '18%', bottom: '14%', containLabel: true }
-    ],
-    title: [
-      { text: '发货吨数', left: '17%', top: '3%', textStyle: { fontSize: 13, fontFamily: FONT, color: COLORS.navy } },
-      { text: '出库金额（万元）', left: '50%', top: '3%', textAlign: 'center', textStyle: { fontSize: 13, fontFamily: FONT, color: COLORS.navy } },
-      { text: '加权均价（元/吨）', left: '83%', top: '3%', textAlign: 'center', textStyle: { fontSize: 13, fontFamily: FONT, color: COLORS.navy } }
-    ],
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, textStyle: { fontFamily: FONT, fontSize: mobile ? 12 : 13 } },
+    grid: grids,
+    title: titles,
     xAxis: [
-      { type: 'category', gridIndex: 0, data: cats, axisLabel: { fontFamily: FONT, fontSize: 12 } },
-      { type: 'category', gridIndex: 1, data: cats, axisLabel: { fontFamily: FONT, fontSize: 12 } },
-      { type: 'category', gridIndex: 2, data: cats, axisLabel: { fontFamily: FONT, fontSize: 12 } }
+      { type: 'category', gridIndex: 0, data: cats, axisLabel: { fontFamily: FONT, fontSize: axisFs, fontWeight: mobile ? 700 : 400 } },
+      { type: 'category', gridIndex: 1, data: cats, axisLabel: { fontFamily: FONT, fontSize: axisFs, fontWeight: mobile ? 700 : 400 } },
+      { type: 'category', gridIndex: 2, data: cats, axisLabel: { fontFamily: FONT, fontSize: axisFs, fontWeight: mobile ? 700 : 400 } }
     ],
     yAxis: [
-      { type: 'value', gridIndex: 0, axisLabel: { fontFamily: FONT, fontSize: 11 } },
-      { type: 'value', gridIndex: 1, axisLabel: { fontFamily: FONT, fontSize: 11 } },
-      { type: 'value', gridIndex: 2, axisLabel: { fontFamily: FONT, fontSize: 11 } }
+      { type: 'value', gridIndex: 0, axisLabel: { fontFamily: FONT, fontSize: yFs } },
+      { type: 'value', gridIndex: 1, axisLabel: { fontFamily: FONT, fontSize: yFs } },
+      { type: 'value', gridIndex: 2, axisLabel: { fontFamily: FONT, fontSize: yFs } }
     ],
     series: [
       {
         type: 'bar', xAxisIndex: 0, yAxisIndex: 0,
         data: data.map((x,i) => ({ value: x.qty, itemStyle: { color: colors[i], borderRadius: [4,4,0,0] } })),
-        barWidth: '50%',
-        label: { show: true, position: 'top', formatter: p => p.value.toLocaleString(), fontFamily: FONT, fontSize: 11, fontWeight: 700 }
+        barWidth: mobile ? '45%' : '50%',
+        label: { show: true, position: 'top', formatter: p => p.value.toLocaleString(), fontFamily: FONT, fontSize: mobile ? 10 : 11, fontWeight: 700 }
       },
       {
         type: 'bar', xAxisIndex: 1, yAxisIndex: 1,
         data: data.map((x,i) => ({ value: x.amt_wan, itemStyle: { color: colors[i], borderRadius: [4,4,0,0] } })),
-        barWidth: '50%',
-        label: { show: true, position: 'top', formatter: p => p.value.toLocaleString(), fontFamily: FONT, fontSize: 11, fontWeight: 700 }
+        barWidth: mobile ? '45%' : '50%',
+        label: { show: true, position: 'top', formatter: p => p.value.toLocaleString(), fontFamily: FONT, fontSize: mobile ? 10 : 11, fontWeight: 700 }
       },
       {
         type: 'bar', xAxisIndex: 2, yAxisIndex: 2,
         data: data.map((x,i) => ({ value: x.avg_price, itemStyle: { color: colors[i], borderRadius: [4,4,0,0] } })),
-        barWidth: '50%',
-        label: { show: true, position: 'top', formatter: p => p.value.toLocaleString(), fontFamily: FONT, fontSize: 11, fontWeight: 700 }
+        barWidth: mobile ? '45%' : '50%',
+        label: { show: true, position: 'top', formatter: p => p.value.toLocaleString(), fontFamily: FONT, fontSize: mobile ? 10 : 11, fontWeight: 700 }
       }
     ]
   });
-  window.addEventListener('resize', () => chart.resize());
+  registerChart(chart);
 }
 
 // ============ TOP 10 客户：横向条形 ============
 function renderTopCust(containerId, data) {
   const chart = echarts.init(document.getElementById(containerId));
   const sorted = [...data].sort((a,b) => a.amt_wan - b.amt_wan); // 从下到上递增
+  const mobile = IS_MOBILE();
   chart.setOption({
     tooltip: {
       trigger: 'axis', axisPointer: { type: 'shadow' },
-      textStyle: { fontFamily: FONT },
+      textStyle: { fontFamily: FONT, fontSize: mobile ? 12 : 13 },
       formatter: p => {
         const d = sorted[p[0].dataIndex];
         return `<b>${d.name}</b><br/>品类：${d.cat}<br/>订单数：${d.orders.toLocaleString()}<br/>吨数：${d.qty.toLocaleString()} 吨<br/>金额：<b>${d.amt_wan.toLocaleString()} 万</b>`;
       }
     },
-    grid: { left: 220, right: 100, top: 20, bottom: 30 },
-    xAxis: { type: 'value', axisLabel: { fontFamily: FONT, formatter: '{value} 万' } },
+    grid: mobile
+      ? { left: 4, right: 4, top: 10, bottom: 40, containLabel: true }
+      : { left: 220, right: 100, top: 20, bottom: 30 },
+    xAxis: {
+      type: 'value',
+      axisLabel: { fontFamily: FONT, fontSize: mobile ? 10 : 12, formatter: mobile ? '{value}' : '{value} 万' }
+    },
     yAxis: {
       type: 'category',
       data: sorted.map(x => x.name),
-      axisLabel: { fontFamily: FONT, fontSize: 12, width: 200, overflow: 'truncate' }
+      axisLabel: {
+        fontFamily: FONT,
+        fontSize: mobile ? 11 : 12,
+        width: mobile ? 88 : 200,
+        overflow: 'truncate'
+      }
     },
     legend: {
       data: ['纯碱', '尿素', '小苏打'],
       bottom: 0, left: 'center',
-      textStyle: { fontFamily: FONT }
+      textStyle: { fontFamily: FONT, fontSize: mobile ? 11 : 12 }
     },
     series: [{
       type: 'bar',
       data: sorted.map(x => ({ value: x.amt_wan, itemStyle: { color: CAT_COLORS[x.cat] } })),
-      barWidth: '65%',
+      barWidth: mobile ? '60%' : '65%',
       label: {
-        show: true, position: 'right',
-        formatter: p => p.value.toLocaleString() + ' 万',
-        fontFamily: FONT, fontSize: 11, fontWeight: 700, color: '#2B2F3E'
+        show: true,
+        position: mobile ? 'insideRight' : 'right',
+        formatter: p => mobile ? p.value.toLocaleString() : p.value.toLocaleString() + ' 万',
+        fontFamily: FONT,
+        fontSize: mobile ? 10 : 11,
+        fontWeight: 700,
+        color: mobile ? '#fff' : '#2B2F3E'
       }
     }]
   });
-  window.addEventListener('resize', () => chart.resize());
+  registerChart(chart);
 }
 
 // ============ 区域流向：横向条形 ============
@@ -1147,6 +1258,7 @@ function renderRegion(containerId, data) {
   const chart = echarts.init(document.getElementById(containerId));
   const sorted = [...data].sort((a,b) => a.qty - b.qty);
   const total = sorted.reduce((s,x) => s+x.qty, 0);
+  const mobile = IS_MOBILE();
   // 渐变色
   const colors = sorted.map((_, i) => {
     const rank = sorted.length - 1 - i;
@@ -1158,34 +1270,47 @@ function renderRegion(containerId, data) {
   chart.setOption({
     tooltip: {
       trigger: 'axis', axisPointer: { type: 'shadow' },
-      textStyle: { fontFamily: FONT },
+      textStyle: { fontFamily: FONT, fontSize: mobile ? 12 : 13 },
       formatter: p => {
         const d = sorted[p[0].dataIndex];
         return `<b>${d.name}</b><br/>吨数：<b>${d.qty.toLocaleString()} 吨</b><br/>客户数：${d.customers} 家<br/>占比：${(d.qty/total*100).toFixed(1)}%`;
       }
     },
-    grid: { left: 150, right: 260, top: 20, bottom: 20 },
-    xAxis: { type: 'value', axisLabel: { fontFamily: FONT } },
+    grid: mobile
+      ? { left: 4, right: 4, top: 10, bottom: 20, containLabel: true }
+      : { left: 150, right: 260, top: 20, bottom: 20 },
+    xAxis: { type: 'value', axisLabel: { fontFamily: FONT, fontSize: mobile ? 10 : 12 } },
     yAxis: {
       type: 'category',
       data: sorted.map(x => x.name),
-      axisLabel: { fontFamily: FONT, fontSize: 12 }
+      axisLabel: {
+        fontFamily: FONT,
+        fontSize: mobile ? 11 : 12,
+        width: mobile ? 80 : 160,
+        overflow: 'truncate'
+      }
     },
     series: [{
       type: 'bar',
       data: sorted.map((x, i) => ({ value: x.qty, itemStyle: { color: colors[i] } })),
-      barWidth: '65%',
+      barWidth: mobile ? '60%' : '65%',
       label: {
-        show: true, position: 'right',
+        show: true,
+        position: mobile ? 'insideRight' : 'right',
         formatter: p => {
           const d = sorted[p.dataIndex];
-          return `${d.qty.toLocaleString()} 吨  ·  ${d.customers} 家  ·  ${(d.qty/total*100).toFixed(1)}%`;
+          return mobile
+            ? `${d.qty.toLocaleString()}吨·${(d.qty/total*100).toFixed(1)}%`
+            : `${d.qty.toLocaleString()} 吨  ·  ${d.customers} 家  ·  ${(d.qty/total*100).toFixed(1)}%`;
         },
-        fontFamily: FONT, fontSize: 11, color: '#2B2F3E'
+        fontFamily: FONT,
+        fontSize: mobile ? 10 : 11,
+        fontWeight: mobile ? 700 : 400,
+        color: mobile ? '#fff' : '#2B2F3E'
       }
     }]
   });
-  window.addEventListener('resize', () => chart.resize());
+  registerChart(chart);
 }
 
 // ============ 价格区间 ============
@@ -1263,7 +1388,7 @@ function renderPrice(containerId, data) {
       }
     ]
   });
-  window.addEventListener('resize', () => chart.resize());
+  registerChart(chart);
 }
 
 // ============ 订单规模：堆积柱 ============
@@ -1295,33 +1420,42 @@ function renderOrderSize(containerId, data) {
     yAxis: { type: 'value', name: '订单数', axisLabel: { fontFamily: FONT } },
     series: series
   });
-  window.addEventListener('resize', () => chart.resize());
+  registerChart(chart);
 }
 
 // ============ 6月趋势折线 ============
 function renderTrendLine(containerId, trend) {
   const chart = echarts.init(document.getElementById(containerId));
+  const mobile = IS_MOBILE();
   chart.setOption({
-    tooltip: { trigger: 'axis', textStyle: { fontFamily: FONT } },
-    legend: { data: ['纯碱', '尿素', '小苏打'], top: 0, textStyle: { fontFamily: FONT, fontSize: 13, fontWeight: 700 } },
-    grid: { left: 60, right: 40, top: 50, bottom: 50 },
+    tooltip: { trigger: 'axis', textStyle: { fontFamily: FONT, fontSize: mobile ? 12 : 13 } },
+    legend: { data: ['纯碱', '尿素', '小苏打'], top: 0, textStyle: { fontFamily: FONT, fontSize: mobile ? 12 : 13, fontWeight: 700 } },
+    grid: mobile
+      ? { left: 10, right: 10, top: 40, bottom: 30, containLabel: true }
+      : { left: 60, right: 40, top: 50, bottom: 50 },
     xAxis: {
       type: 'category',
       data: trend.months,
-      axisLabel: { fontFamily: FONT, fontSize: 12, fontWeight: 600 },
+      axisLabel: {
+        fontFamily: FONT,
+        fontSize: mobile ? 10 : 12,
+        fontWeight: 600,
+        interval: 0,
+        rotate: mobile ? 30 : 0
+      },
       boundaryGap: false
     },
-    yAxis: { type: 'value', name: '发货吨数', axisLabel: { fontFamily: FONT } },
+    yAxis: { type: 'value', name: '发货吨数', axisLabel: { fontFamily: FONT, fontSize: mobile ? 10 : 12 }, nameTextStyle: { fontFamily: FONT, fontSize: mobile ? 10 : 12 } },
     series: ['纯碱', '尿素', '小苏打'].map(cat => ({
       name: cat,
       type: 'line',
       data: trend[cat],
       smooth: false,
-      lineStyle: { color: CAT_COLORS[cat], width: 3 },
+      lineStyle: { color: CAT_COLORS[cat], width: mobile ? 2.5 : 3 },
       itemStyle: { color: CAT_COLORS[cat], borderColor: '#fff', borderWidth: 2 },
-      symbolSize: 10,
+      symbolSize: mobile ? 7 : 10,
       label: {
-        show: true,
+        show: !mobile,
         formatter: p => p.value.toLocaleString(),
         fontFamily: FONT, fontSize: 11, fontWeight: 700,
         color: CAT_COLORS[cat]
@@ -1353,7 +1487,7 @@ function renderTrendLine(containerId, trend) {
     } : s)
   });
 
-  window.addEventListener('resize', () => chart.resize());
+  registerChart(chart);
 }
 
 // ============ 月度分品类堆积 ============
@@ -1374,50 +1508,50 @@ function renderTrendStack(containerId, trend) {
       barWidth: '55%'
     }))
   });
-  window.addEventListener('resize', () => chart.resize());
-}
-
-// ============ 第二期状态 ============
-function renderPhase2() {
-  const p2 = DATA.meta.phase2;
-  const items = [
-    { label: '3-4 月订单总数', value: p2.total_orders.toLocaleString() + ' 单' },
-    { label: '已匹配业务员订单', value: p2.matched.toLocaleString() + ' 单 (' + p2.matched_pct + '%)' },
-    { label: '待匹配订单', value: p2.unmatched_orders.toLocaleString() + ' 单 / ' + p2.unmatched_customers + ' 位客户' },
-    { label: '历史业务员数量', value: p2.historical_agents + ' 位（近半年 mapping）' }
-  ];
-  document.getElementById('phase2-status').innerHTML = items.map(i => `
-    <div class="status-card">
-      <div class="label">${i.label}</div>
-      <div class="value">${i.value}</div>
-    </div>
-  `).join('');
+  registerChart(chart);
 }
 
 // ============ Init ============
-renderKPI('march-kpi', DATA.march.kpi, '');
-renderObs('march-obs', DATA.march, '3月');
-renderDonut('march-donut-qty', DATA.march.by_cat, 'qty', '吨');
-renderDonut('march-donut-amt', DATA.march.by_cat, 'amt_wan', '万元');
-renderCatPerf('march-cat-perf', DATA.march.by_cat);
-renderTopCust('march-top-cust', DATA.march.top_cust);
-renderRegion('march-region', DATA.march.regions);
-renderPrice('march-price', DATA.march.price);
-renderOrderSize('march-size', DATA.march.size_dist);
+function renderAll() {
+  disposeAllCharts();
+  renderKPI('march-kpi', DATA.march.kpi, '');
+  renderObs('march-obs', DATA.march, '3月');
+  renderDonut('march-donut-qty', DATA.march.by_cat, 'qty', '吨');
+  renderDonut('march-donut-amt', DATA.march.by_cat, 'amt_wan', '万元');
+  renderCatPerf('march-cat-perf', DATA.march.by_cat);
+  renderTopCust('march-top-cust', DATA.march.top_cust);
+  renderRegion('march-region', DATA.march.regions);
+  renderPrice('march-price', DATA.march.price);
+  renderOrderSize('march-size', DATA.march.size_dist);
 
-renderKPI('april-kpi', DATA.april.kpi, 'orange');
-renderObs('april-obs', DATA.april, '4月');
-renderDonut('april-donut-qty', DATA.april.by_cat, 'qty', '吨');
-renderDonut('april-donut-amt', DATA.april.by_cat, 'amt_wan', '万元');
-renderCatPerf('april-cat-perf', DATA.april.by_cat);
-renderTopCust('april-top-cust', DATA.april.top_cust);
-renderRegion('april-region', DATA.april.regions);
-renderPrice('april-price', DATA.april.price);
-renderOrderSize('april-size', DATA.april.size_dist);
+  renderKPI('april-kpi', DATA.april.kpi, 'orange');
+  renderObs('april-obs', DATA.april, '4月');
+  renderDonut('april-donut-qty', DATA.april.by_cat, 'qty', '吨');
+  renderDonut('april-donut-amt', DATA.april.by_cat, 'amt_wan', '万元');
+  renderCatPerf('april-cat-perf', DATA.april.by_cat);
+  renderTopCust('april-top-cust', DATA.april.top_cust);
+  renderRegion('april-region', DATA.april.regions);
+  renderPrice('april-price', DATA.april.price);
+  renderOrderSize('april-size', DATA.april.size_dist);
 
-renderTrendLine('trend-line', DATA.trend);
-renderTrendStack('trend-stack', DATA.trend);
-renderPhase2();
+  renderTrendLine('trend-line', DATA.trend);
+  renderTrendStack('trend-stack', DATA.trend);
+}
+renderAll();
+
+// 跨断点（手机/桌面）自动重渲染
+let _lastMobile = IS_MOBILE();
+let _resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(() => {
+    const now = IS_MOBILE();
+    if (now !== _lastMobile) {
+      _lastMobile = now;
+      renderAll();
+    }
+  }, 250);
+});
 </script>
 
 </body>
