@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>销售五区 3-4月报单数据看板</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --primary: #2F5496;
+      --primary-light: #4472C4;
+      --accent: #ED7D31;
+      --green: #70AD47;
+      --bg: #f0f2f5;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --text-light: #6b7280;
+      --border: #e5e7eb;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: #fff;
+      padding: 24px 16px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .header p {
+      font-size: 13px;
+      opacity: 0.85;
+      margin-top: 4px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* KPI Cards */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    @media (min-width: 768px) {
+      .kpi-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .kpi-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      color: var(--text-light);
+      margin-bottom: 4px;
+    }
+
+    .kpi-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .kpi-sub {
+      font-size: 11px;
+      color: var(--text-light);
+      margin-top: 2px;
+    }
+
+    .kpi-card.accent .kpi-value {
+      color: var(--accent);
+    }
+
+    .kpi-card.green .kpi-value {
+      color: var(--green);
+    }
+
+    /* Section */
+    .section {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--primary-light);
+    }
+
+    /* Chart container */
+    .chart-wrap {
+      position: relative;
+      width: 100%;
+      max-height: 350px;
+    }
+
+    .chart-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 768px) {
+      .chart-row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* Tables */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .data-table th {
+      background: var(--primary-light);
+      color: #fff;
+      padding: 10px 8px;
+      text-align: center;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .data-table td {
+      padding: 8px;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .data-table tr:hover {
+      background: #f8f9ff;
+    }
+
+    .data-table .text-left {
+      text-align: left;
+    }
+
+    .data-table .total-row {
+      background: #e8f5e9;
+      font-weight: 700;
+    }
+
+    .data-table .highlight {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Responsive table */
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Tag */
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .tag-urea {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+
+    .tag-soda {
+      background: #fce4ec;
+      color: #c62828;
+    }
+
+    .tag-baking {
+      background: #fff3e0;
+      color: #e65100;
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .badge-up {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .badge-down {
+      background: #fce4ec;
+      color: #c62828;
+    }
+
+    /* Note */
+    .note {
+      background: #fff8e1;
+      border-left: 4px solid #ffc107;
+      padding: 12px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 16px;
+      font-size: 13px;
+      color: #795548;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-light);
+      font-size: 12px;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 16px;
+      border-bottom: 2px solid var(--border);
+      overflow-x: auto;
+    }
+
+    .tab {
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-light);
+      border-bottom: 3px solid transparent;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <h1>销售五区 · 3-4月报单数据看板</h1>
+    <p>数据区间：2026年3月1日 — 4月15日 ｜ 报告生成：2026年4月16日</p>
+  </div>
+
+  <div class="container">
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">3月总报单</div>
+        <div class="kpi-value">5,175</div>
+        <div class="kpi-sub">笔（全品类合计）</div>
+      </div>
+      <div class="kpi-card accent">
+        <div class="kpi-label">4月总报单（半月）</div>
+        <div class="kpi-value">1,997</div>
+        <div class="kpi-sub">笔 · 截至4月15日</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label">3月总出库金额</div>
+        <div class="kpi-value">2.63亿</div>
+        <div class="kpi-sub">元</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">4月总出库金额</div>
+        <div class="kpi-value">1.32亿</div>
+        <div class="kpi-sub">元 · 半月数据</div>
+      </div>
+    </div>
+
+    <!-- Section 1: 品类月度报单 -->
+    <div class="section">
+      <div class="section-title">一、各品类月度报单统计</div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>品类</th>
+              <th>月份</th>
+              <th>报单数</th>
+              <th>发货吨数</th>
+              <th>出库金额（万元）</th>
+              <th>单均吨数</th>
+              <th>均价</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="tag tag-urea">尿素</span></td>
+              <td>3月</td>
+              <td>2,073</td>
+              <td>72,094</td>
+              <td>12,157</td>
+              <td>34.8</td>
+              <td>1,674</td>
+            </tr>
+            <tr>
+              <td><span class="tag tag-urea">尿素</span></td>
+              <td>4月</td>
+              <td>944</td>
+              <td>38,023</td>
+              <td>6,647</td>
+              <td>40.3</td>
+              <td>1,749</td>
+            </tr>
+            <tr>
+              <td><span class="tag tag-soda">纯碱</span></td>
+              <td>3月</td>
+              <td>2,001</td>
+              <td>105,883</td>
+              <td>11,127</td>
+              <td>52.9</td>
+              <td>968</td>
+            </tr>
+            <tr>
+              <td><span class="tag tag-soda">纯碱</span></td>
+              <td>4月</td>
+              <td>641</td>
+              <td>48,517</td>
+              <td>5,448</td>
+              <td>75.7</td>
+              <td>991</td>
+            </tr>
+            <tr>
+              <td><span class="tag tag-baking">小苏打</span></td>
+              <td>3月</td>
+              <td>1,101</td>
+              <td>35,872</td>
+              <td>3,071</td>
+              <td>32.6</td>
+              <td>886</td>
+            </tr>
+            <tr>
+              <td><span class="tag tag-baking">小苏打</span></td>
+              <td>4月</td>
+              <td>412</td>
+              <td>14,317</td>
+              <td>1,237</td>
+              <td>34.8</td>
+              <td>939</td>
+            </tr>
+            <tr class="total-row">
+              <td>合计</td>
+              <td>3月</td>
+              <td>5,175</td>
+              <td>213,849</td>
+              <td>26,355</td>
+              <td>41.3</td>
+              <td>—</td>
+            </tr>
+            <tr class="total-row">
+              <td>合计</td>
+              <td>4月</td>
+              <td>1,997</td>
+              <td>100,857</td>
+              <td>13,332</td>
+              <td>50.5</td>
+              <td>—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">⚠️ 4月数据仅统计至4月15日（半月），不宜与3月整月直接对比。若按日均折算，4月日均报单 133 笔 vs 3月日均 172 笔。</div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="chart-row">
+      <div class="section">
+        <div class="section-title">报单数量对比</div>
+        <div class="chart-wrap"><canvas id="chartOrders"></canvas></div>
+      </div>
+      <div class="section">
+        <div class="section-title">出库金额对比（万元）</div>
+        <div class="chart-wrap"><canvas id="chartAmount"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Section 2: 团队统计 -->
+    <div class="section">
+      <div class="section-title">二、各团队（部门）报单统计</div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>团队</th>
+              <th>月份</th>
+              <th>报单数</th>
+              <th>发货吨数</th>
+              <th>出库金额（万元）</th>
+              <th>报单占比</th>
+              <th>金额占比</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left">西南西北区域</td>
+              <td>3月</td>
+              <td>4,020</td>
+              <td>177,113</td>
+              <td>20,289</td>
+              <td>77.7%</td>
+              <td>77.0%</td>
+            </tr>
+            <tr>
+              <td class="text-left">刘军团队</td>
+              <td>3月</td>
+              <td>1,112</td>
+              <td>35,679</td>
+              <td>5,817</td>
+              <td>21.5%</td>
+              <td>22.1%</td>
+            </tr>
+            <tr>
+              <td class="text-left">刘义团队</td>
+              <td>3月</td>
+              <td>43</td>
+              <td>1,357</td>
+              <td>261</td>
+              <td>0.8%</td>
+              <td>1.0%</td>
+            </tr>
+            <tr class="total-row">
+              <td>合计</td>
+              <td>3月</td>
+              <td>5,175</td>
+              <td>214,149</td>
+              <td>26,367</td>
+              <td>100%</td>
+              <td>100%</td>
+            </tr>
+            <tr>
+              <td class="text-left">西南西北区域</td>
+              <td>4月</td>
+              <td>1,929</td>
+              <td>98,978</td>
+              <td>13,025</td>
+              <td>96.6%</td>
+              <td>97.7%</td>
+            </tr>
+            <tr>
+              <td class="text-left">刘军团队</td>
+              <td>4月</td>
+              <td>68</td>
+              <td>1,879</td>
+              <td>310</td>
+              <td>3.4%</td>
+              <td>2.3%</td>
+            </tr>
+            <tr class="total-row">
+              <td>合计</td>
+              <td>4月</td>
+              <td>1,997</td>
+              <td>100,857</td>
+              <td>13,335</td>
+              <td>100%</td>
+              <td>100%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Chart: Team pie -->
+    <div class="chart-row">
+      <div class="section">
+        <div class="section-title">3月团队报单占比</div>
+        <div class="chart-wrap"><canvas id="chartTeam3"></canvas></div>
+      </div>
+      <div class="section">
+        <div class="section-title">4月团队报单占比</div>
+        <div class="chart-wrap"><canvas id="chartTeam4"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Section 3: 价格趋势 -->
+    <div class="section">
+      <div class="section-title">三、产品价格变动（3月 → 4月）</div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>产品</th>
+              <th>3月均价</th>
+              <th>4月均价</th>
+              <th>变动</th>
+              <th>幅度</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left">尿素</td>
+              <td>1,674</td>
+              <td>1,707</td>
+              <td class="highlight">+33</td>
+              <td><span class="badge badge-up">↑ 1.9%</span></td>
+            </tr>
+            <tr>
+              <td class="text-left">轻质纯碱</td>
+              <td>997</td>
+              <td>1,027</td>
+              <td class="highlight">+30</td>
+              <td><span class="badge badge-up">↑ 3.1%</span></td>
+            </tr>
+            <tr>
+              <td class="text-left">重质纯碱</td>
+              <td>951</td>
+              <td>988</td>
+              <td class="highlight">+37</td>
+              <td><span class="badge badge-up">↑ 3.9%</span></td>
+            </tr>
+            <tr>
+              <td class="text-left">食用纯碱</td>
+              <td>909</td>
+              <td>914</td>
+              <td class="highlight">+5</td>
+              <td><span class="badge badge-up">↑ 0.5%</span></td>
+            </tr>
+            <tr>
+              <td class="text-left">食品级小苏打</td>
+              <td>840</td>
+              <td>839</td>
+              <td>-1</td>
+              <td><span class="badge badge-down">↓ 0.2%</span></td>
+            </tr>
+            <tr>
+              <td class="text-left">饲料级小苏打</td>
+              <td>914</td>
+              <td>939</td>
+              <td class="highlight">+25</td>
+              <td><span class="badge badge-up">↑ 2.7%</span></td>
+            </tr>
+            <tr>
+              <td class="text-left">除尘碱</td>
+              <td>854</td>
+              <td>877</td>
+              <td class="highlight">+23</td>
+              <td><span class="badge badge-up">↑ 2.7%</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">价格变动趋势图</div>
+      <div class="chart-wrap"><canvas id="chartPrice"></canvas></div>
+    </div>
+
+    <!-- Section 4: 区域TOP10 -->
+    <div class="section">
+      <div class="section-title">四、区域流向 TOP10（按出库金额）</div>
+      <div class="chart-wrap" style="max-height:400px"><canvas id="chartRegion"></canvas></div>
+    </div>
+
+    <!-- Section 5: TOP客户 -->
+    <div class="section">
+      <div class="section-title">五、各品类 TOP5 客户</div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this, 'tab-urea')">尿素</div>
+        <div class="tab" onclick="switchTab(this, 'tab-soda')">纯碱</div>
+        <div class="tab" onclick="switchTab(this, 'tab-baking')">小苏打</div>
+      </div>
+      <div id="tab-urea" class="tab-content active">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>客户名称</th>
+                <th>报单数</th>
+                <th>吨数</th>
+                <th>金额（万元）</th>
+                <th>区域</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td class="text-left">中农（天津）化肥有限公司</td>
+                <td>459</td>
+                <td>16,457</td>
+                <td>2,709</td>
+                <td>安道尔</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td class="text-left">河北省农业生产资料集团有限公司</td>
+                <td>280</td>
+                <td>9,414</td>
+                <td>1,587</td>
+                <td>河北省</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td class="text-left">海南浩博农业开发有限公司</td>
+                <td>201</td>
+                <td>6,600</td>
+                <td>1,090</td>
+                <td>洮南市</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td class="text-left">石家庄农桥贸易有限公司</td>
+                <td>141</td>
+                <td>4,629</td>
+                <td>790</td>
+                <td>河北省</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td class="text-left">中农（内蒙古）农资有限公司</td>
+                <td>117</td>
+                <td>3,826</td>
+                <td>686</td>
+                <td>安道尔</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div id="tab-soda" class="tab-content">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>客户名称</th>
+                <th>报单数</th>
+                <th>吨数</th>
+                <th>金额（万元）</th>
+                <th>区域</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td class="text-left">重庆民丰化工有限责任公司</td>
+                <td>34</td>
+                <td>16,290</td>
+                <td>1,912</td>
+                <td>重庆市</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td class="text-left">广西新福兴硅科技有限公司</td>
+                <td>19</td>
+                <td>14,377</td>
+                <td>1,827</td>
+                <td>广西</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td class="text-left">中铝物资有限公司</td>
+                <td>262</td>
+                <td>12,547</td>
+                <td>1,525</td>
+                <td>山西省</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td class="text-left">广西德金新材料科技有限公司</td>
+                <td>18</td>
+                <td>8,204</td>
+                <td>1,055</td>
+                <td>广西</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td class="text-left">海南维新国际供应链管理有限责任公司</td>
+                <td>20</td>
+                <td>7,459</td>
+                <td>976</td>
+                <td>四川省</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div id="tab-baking" class="tab-content">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>客户名称</th>
+                <th>报单数</th>
+                <th>吨数</th>
+                <th>金额（万元）</th>
+                <th>区域</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td class="text-left">内蒙古阜丰生物科技有限公司</td>
+                <td>287</td>
+                <td>9,864</td>
+                <td>901</td>
+                <td>内蒙古</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td class="text-left">宁夏云海帆歌科技有限公司</td>
+                <td>130</td>
+                <td>9,183</td>
+                <td>906</td>
+                <td>宁夏</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td class="text-left">宁夏伊品生物科技股份有限公司</td>
+                <td>246</td>
+                <td>8,612</td>
+                <td>777</td>
+                <td>宁夏</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td class="text-left">山西国利天能科技有限公司</td>
+                <td>271</td>
+                <td>9,450</td>
+                <td>851</td>
+                <td>山西省</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td class="text-left">嘉峪关市兴化储科教设备有限责任公司</td>
+                <td>11</td>
+                <td>367</td>
+                <td>37</td>
+                <td>甘肃省</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 6: 产品流向 -->
+    <div class="section">
+      <div class="section-title">六、产品流向分布</div>
+      <div class="chart-wrap"><canvas id="chartFlow"></canvas></div>
+    </div>
+
+    <div class="note" style="margin-bottom:16px">
+      <strong>数据说明：</strong><br>
+      · 数据来源：4份发货明细表（尿素3月、尿素4月、银根小苏打、银根纯碱发货明细表）<br>
+      · 品类划分：纯碱 = 轻质纯碱+重质纯碱+食用纯碱+除尘碱；小苏打 = 食品级+饲料级+落地小苏打<br>
+      · "部门"字段对应业务团队：西南西北区域、刘军团队、刘义团队<br>
+      · 4月数据截至4月15日，仅为半月数据
+    </div>
+
+    <div class="footer">销售五区 · 数据看板 · 2026年4月16日</div>
+  </div>
+
+  <script>
+    const colors = { blue: '#4472C4', orange: '#ED7D31', green: '#70AD47', red: '#C0504D', purple: '#7030A0', teal: '#00B0F0' };
+    const fontOpts = { family: '-apple-system, "PingFang SC", "Microsoft YaHei", sans-serif' };
+    Chart.defaults.font.family = fontOpts.family;
+    Chart.defaults.font.size = 12;
+
+    // Chart 1: Orders
+    new Chart(document.getElementById('chartOrders'), {
+      type: 'bar',
+      data: {
+        labels: ['尿素', '纯碱', '小苏打'],
+        datasets: [
+          { label: '3月', data: [2073, 2001, 1101], backgroundColor: colors.blue },
+          { label: '4月(半月)', data: [944, 641, 412], backgroundColor: colors.orange }
+        ]
+      },
+      options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true } } }
+    });
+
+    // Chart 2: Amount
+    new Chart(document.getElementById('chartAmount'), {
+      type: 'bar',
+      data: {
+        labels: ['尿素', '纯碱', '小苏打'],
+        datasets: [
+          { label: '3月', data: [12157, 11127, 3071], backgroundColor: colors.blue },
+          { label: '4月(半月)', data: [6647, 5448, 1237], backgroundColor: colors.orange }
+        ]
+      },
+      options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true } } }
+    });
+
+    // Chart 3: Team pie - March
+    new Chart(document.getElementById('chartTeam3'), {
+      type: 'doughnut',
+      data: {
+        labels: ['西南西北区域', '刘军团队', '刘义团队'],
+        datasets: [{ data: [4020, 1112, 43], backgroundColor: [colors.blue, colors.orange, colors.green] }]
+      },
+      options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    // Chart 4: Team pie - April
+    new Chart(document.getElementById('chartTeam4'), {
+      type: 'doughnut',
+      data: {
+        labels: ['西南西北区域', '刘军团队'],
+        datasets: [{ data: [1929, 68], backgroundColor: [colors.blue, colors.orange] }]
+      },
+      options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    // Chart 5: Price comparison
+    new Chart(document.getElementById('chartPrice'), {
+      type: 'bar',
+      data: {
+        labels: ['尿素', '轻质纯碱', '重质纯碱', '食用纯碱', '食品级小苏打', '饲料级小苏打', '除尘碱'],
+        datasets: [
+          { label: '3月均价', data: [1674, 997, 951, 909, 840, 914, 854], backgroundColor: 'rgba(68,114,196,0.7)' },
+          { label: '4月均价', data: [1707, 1027, 988, 914, 839, 939, 877], backgroundColor: 'rgba(237,125,49,0.7)' }
+        ]
+      },
+      options: { responsive: true, maintainAspectRatio: true, indexAxis: 'y', plugins: { legend: { position: 'bottom' } } }
+    });
+
+    // Chart 6: Region TOP10
+    new Chart(document.getElementById('chartRegion'), {
+      type: 'bar',
+      data: {
+        labels: ['山西省', '安道尔', '河北省', '内蒙古', '宁夏', '新疆', '四川省', '重庆市', '广西', '陕西省'],
+        datasets: [{ label: '出库金额(万元)', data: [9354, 3863, 2178, 1914, 1780, 1230, 1100, 1050, 980, 850], backgroundColor: colors.blue }]
+      },
+      options: { responsive: true, maintainAspectRatio: true, indexAxis: 'y', plugins: { legend: { display: false } } }
+    });
+
+    // Chart 7: Product flow
+    new Chart(document.getElementById('chartFlow'), {
+      type: 'doughnut',
+      data: {
+        labels: ['化肥下游', '农业需求', '平板玻璃', '食品添加剂', '日用玻璃', '饲料', '脱硫脱硝', '环保', '其他'],
+        datasets: [{ data: [1328, 1464, 815, 670, 372, 404, 147, 70, 200], backgroundColor: ['#4472C4', '#ED7D31', '#70AD47', '#FFC000', '#5B9BD5', '#C0504D', '#7030A0', '#00B0F0', '#BFBFBF'] }]
+      },
+      options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 8 } } } }
+    });
+
+    function switchTab(el, id) {
+      el.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      el.closest('.section').querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+  </script>
+</body>
+
+</html>
