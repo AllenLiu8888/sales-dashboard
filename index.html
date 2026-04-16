@@ -375,6 +375,7 @@
   <div class="tab march active" data-panel="march"><span class="dot"></span>3 月销售</div>
   <div class="tab april" data-panel="april"><span class="dot"></span>4 月销售<span class="count">半月</span></div>
   <div class="tab" data-panel="trend">6 月趋势附录</div>
+  <div class="tab" data-panel="customer">客户动向</div>
 </div>
 
 <main>
@@ -422,18 +423,11 @@
       <div class="chart tall" id="march-region"></div>
     </div>
 
-    <!-- 价格 & 订单结构 -->
-    <div class="grid grid-2" style="margin-top:20px;">
-      <div class="card">
-        <div class="card-title">价格水位</div>
-        <div class="card-sub">各品类最低 / 加权均价 / 最高 区间</div>
-        <div class="chart" id="march-price"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">订单规模分布</div>
-        <div class="card-sub">按吨数档位 · 订单数</div>
-        <div class="chart" id="march-size"></div>
-      </div>
+    <!-- 发货规模分布 -->
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">发货规模分布</div>
+      <div class="card-sub">按单笔发货吨数分档 · 发货单数</div>
+      <div class="chart" id="march-size"></div>
     </div>
   </div>
 
@@ -477,17 +471,10 @@
       <div class="chart tall" id="april-region"></div>
     </div>
 
-    <div class="grid grid-2" style="margin-top:20px;">
-      <div class="card">
-        <div class="card-title">价格水位</div>
-        <div class="card-sub">各品类最低 / 加权均价 / 最高 区间</div>
-        <div class="chart" id="april-price"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">订单规模分布</div>
-        <div class="card-sub">按吨数档位 · 订单数</div>
-        <div class="chart" id="april-size"></div>
-      </div>
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">发货规模分布</div>
+      <div class="card-sub">按单笔发货吨数分档 · 发货单数</div>
+      <div class="chart" id="april-size"></div>
     </div>
   </div>
 
@@ -511,6 +498,62 @@
       <div class="card-title">月度分品类堆积</div>
       <div class="card-sub">各月份品类构成</div>
       <div class="chart" id="trend-stack"></div>
+    </div>
+  </div>
+
+  <!-- ============ 客户动向 PANEL ============ -->
+  <div class="panel" id="panel-customer">
+    <div class="obs">
+      <strong>客户动向分析</strong><span class="dot"></span>
+      6个月累计 TOP30 客户 × 月份热力矩阵<span class="dot"></span>
+      3月 vs 2月（整月）&amp; 4月半月 vs 3月半月（同期）增减 TOP 10<span class="dot"></span>
+      新客户 / 流失客户清单<span class="dot"></span>
+      客户名称已统一（全角/半角括号归一）
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <div class="card-title">TOP 30 客户 × 6 月吨数矩阵</div>
+      <div class="card-sub">按 6 个月累计吨数排序 · 颜色深浅代表发货强度</div>
+      <div class="chart tall" id="cust-matrix" style="height:640px;"></div>
+    </div>
+
+    <div class="grid grid-2" style="margin-top:20px;">
+      <div class="card">
+        <div class="card-title" style="color:#2e7d32;">增长 TOP 10 · 3月 vs 2月（整月）</div>
+        <div class="card-sub">变化量 = 3月吨数 − 2月吨数</div>
+        <div class="chart tall" id="cust-up-3v2"></div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:#c62828;">下降 TOP 10 · 3月 vs 2月（整月）</div>
+        <div class="card-sub">负值排序 · 2月活跃但3月回落</div>
+        <div class="chart tall" id="cust-dn-3v2"></div>
+      </div>
+    </div>
+
+    <div class="grid grid-2" style="margin-top:20px;">
+      <div class="card">
+        <div class="card-title" style="color:#2e7d32;">增长 TOP 10 · 4月半月 vs 3月半月</div>
+        <div class="card-sub">同期（4/1-14 vs 3/1-14）可比对比</div>
+        <div class="chart tall" id="cust-up-4v3h"></div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:#c62828;">下降 TOP 10 · 4月半月 vs 3月半月</div>
+        <div class="card-sub">同期半月对比 · 需关注的失速客户</div>
+        <div class="chart tall" id="cust-dn-4v3h"></div>
+      </div>
+    </div>
+
+    <div class="grid grid-2" style="margin-top:20px;">
+      <div class="card">
+        <div class="card-title" style="color:#2e7d32;">新客户（3月新开单）</div>
+        <div class="card-sub" id="new-cust-sub">3月 ≥ 30 吨 且 2月 = 0</div>
+        <div class="chart tall" id="cust-new"></div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:#c62828;">流失客户（2月活跃 · 3月零发货）</div>
+        <div class="card-sub" id="lost-cust-sub">2月 ≥ 100 吨 且 3月 = 0</div>
+        <div class="chart tall" id="cust-lost"></div>
+      </div>
     </div>
   </div>
 
@@ -680,29 +723,6 @@ const DATA = {
         "customers": 3
       }
     ],
-    "price": [
-      {
-        "cat": "小苏打",
-        "min": 375.0,
-        "max": 1100.0,
-        "median": 840.0,
-        "weighted": 849.0
-      },
-      {
-        "cat": "尿素",
-        "min": 1280.0,
-        "max": 1970.0,
-        "median": 1660.0,
-        "weighted": 1686.0
-      },
-      {
-        "cat": "纯碱",
-        "min": 840.0,
-        "max": 1320.0,
-        "median": 900.0,
-        "weighted": 1051.0
-      }
-    ],
     "size_dist": {
       "纯碱": {
         "<10吨": 14,
@@ -729,36 +749,36 @@ const DATA = {
   },
   "april": {
     "kpi": {
-      "n_orders": 2027,
-      "total_qty": 100857.0,
-      "total_amt_wan": 13338.0,
-      "n_customers": 209,
-      "avg_price": 1322.0
+      "n_orders": 1965,
+      "total_qty": 97947,
+      "total_amt_wan": 13003,
+      "n_customers": 206,
+      "avg_price": 1328
     },
     "by_cat": [
       {
         "cat": "纯碱",
-        "qty": 48517,
-        "amt_wan": 5453.0,
-        "orders": 641,
-        "customers": 43,
-        "avg_price": 1124.0
+        "qty": 46658,
+        "amt_wan": 5246,
+        "orders": 610,
+        "customers": 42,
+        "avg_price": 1124
       },
       {
         "cat": "尿素",
-        "qty": 38023,
-        "amt_wan": 6647.0,
-        "orders": 944,
+        "qty": 37582,
+        "amt_wan": 6572,
+        "orders": 931,
         "customers": 83,
-        "avg_price": 1748.0
+        "avg_price": 1749
       },
       {
         "cat": "小苏打",
-        "qty": 14317,
-        "amt_wan": 1237.0,
-        "orders": 442,
-        "customers": 91,
-        "avg_price": 864.0
+        "qty": 13707,
+        "amt_wan": 1184,
+        "orders": 424,
+        "customers": 89,
+        "avg_price": 864
       }
     ],
     "top_cust": [
@@ -767,166 +787,153 @@ const DATA = {
         "cat": "纯碱",
         "orders": 13,
         "qty": 10410,
-        "amt_wan": 1230.0
+        "amt_wan": 1230
       },
       {
         "name": "中铝物资有限公司",
         "cat": "纯碱",
-        "orders": 80,
-        "qty": 6469,
-        "amt_wan": 791.0
-      },
-      {
-        "name": "广西新福兴硅科技有限公司",
-        "cat": "纯碱",
-        "orders": 8,
-        "qty": 4172,
-        "amt_wan": 531.0
+        "orders": 78,
+        "qty": 6401,
+        "amt_wan": 783
       },
       {
         "name": "河北省农业生产资料集团有限公司",
         "cat": "尿素",
         "orders": 87,
         "qty": 2965,
-        "amt_wan": 504.0
+        "amt_wan": 504
+      },
+      {
+        "name": "广西新福兴硅科技有限公司",
+        "cat": "纯碱",
+        "orders": 7,
+        "qty": 3836,
+        "amt_wan": 488
       },
       {
         "name": "海南浩博农业开发有限公司",
         "cat": "尿素",
         "orders": 84,
         "qty": 2765,
-        "amt_wan": 476.0
+        "amt_wan": 476
       },
       {
         "name": "海南维新国际供应链管理有限责任公司",
         "cat": "纯碱",
         "orders": 12,
         "qty": 3195,
-        "amt_wan": 422.0
+        "amt_wan": 422
+      },
+      {
+        "name": "中农(天津)化肥有限公司",
+        "cat": "尿素",
+        "orders": 34,
+        "qty": 2301,
+        "amt_wan": 421
       },
       {
         "name": "广西德金新材料科技有限公司",
         "cat": "纯碱",
-        "orders": 8,
-        "qty": 3220,
-        "amt_wan": 422.0
-      },
-      {
-        "name": "中农（天津）化肥有限公司",
-        "cat": "尿素",
-        "orders": 34,
-        "qty": 2301,
-        "amt_wan": 421.0
+        "orders": 7,
+        "qty": 2996,
+        "amt_wan": 392
       },
       {
         "name": "石家庄农桥贸易有限公司",
         "cat": "尿素",
-        "orders": 70,
-        "qty": 2376,
-        "amt_wan": 404.0
+        "orders": 68,
+        "qty": 2306,
+        "amt_wan": 392
       },
       {
         "name": "鄂尔多斯市锦融农牧业有限公司",
         "cat": "尿素",
-        "orders": 66,
-        "qty": 2243,
-        "amt_wan": 380.0
+        "orders": 61,
+        "qty": 2068,
+        "amt_wan": 350
       }
     ],
     "regions": [
       {
-        "name": "广西壮族自治区",
-        "qty": 17561,
-        "customers": 12
+        "区域": "广西壮族自治区",
+        "吨数": 16609,
+        "占比": 17.0,
+        "客户数": 12
       },
       {
-        "name": "山西省",
-        "qty": 14268,
-        "customers": 23
+        "区域": "山西省",
+        "吨数": 14029,
+        "占比": 14.3,
+        "客户数": 22
       },
       {
-        "name": "内蒙古自治区",
-        "qty": 11472,
-        "customers": 52
+        "区域": "内蒙古自治区",
+        "吨数": 10878,
+        "占比": 11.1,
+        "客户数": 52
       },
       {
-        "name": "重庆市",
-        "qty": 10480,
-        "customers": 2
+        "区域": "重庆市",
+        "吨数": 10480,
+        "占比": 10.7,
+        "客户数": 2
       },
       {
-        "name": "安道尔",
-        "qty": 6601,
-        "customers": 13
+        "区域": "安道尔",
+        "吨数": 6566,
+        "占比": 6.7,
+        "客户数": 13
       },
       {
-        "name": "四川省",
-        "qty": 5840,
-        "customers": 4
+        "区域": "四川省",
+        "吨数": 5417,
+        "占比": 5.5,
+        "客户数": 4
       },
       {
-        "name": "新巴尔虎右旗",
-        "qty": 5430,
-        "customers": 3
+        "区域": "新巴尔虎右旗",
+        "吨数": 5255,
+        "占比": 5.4,
+        "客户数": 3
       },
       {
-        "name": "河北省",
-        "qty": 4903,
-        "customers": 11
+        "区域": "河北省",
+        "吨数": 4767,
+        "占比": 4.9,
+        "客户数": 11
       },
       {
-        "name": "宁夏回族自治区",
-        "qty": 3504,
-        "customers": 13
+        "区域": "宁夏回族自治区",
+        "吨数": 3368,
+        "占比": 3.4,
+        "客户数": 13
       },
       {
-        "name": "广东省",
-        "qty": 2952,
-        "customers": 5
-      }
-    ],
-    "price": [
-      {
-        "cat": "小苏打",
-        "min": 375.0,
-        "max": 1216.0,
-        "median": 840.0,
-        "weighted": 864.0
-      },
-      {
-        "cat": "尿素",
-        "min": 1280.0,
-        "max": 1961.0,
-        "median": 1720.0,
-        "weighted": 1748.0
-      },
-      {
-        "cat": "纯碱",
-        "min": 820.0,
-        "max": 1330.0,
-        "median": 910.0,
-        "weighted": 1124.0
+        "区域": "广东省",
+        "吨数": 2952,
+        "占比": 3.0,
+        "客户数": 5
       }
     ],
     "size_dist": {
       "纯碱": {
-        "<10吨": 1,
-        "10-30吨": 18,
-        "30-100吨": 564,
-        "100-500吨": 39,
+        "<10吨": 2,
+        "10-30吨": 21,
+        "30-100吨": 536,
+        "100-500吨": 32,
         "≥500吨": 19
       },
       "尿素": {
-        "<10吨": 16,
-        "10-30吨": 44,
-        "30-100吨": 865,
+        "<10吨": 20,
+        "10-30吨": 45,
+        "30-100吨": 847,
         "100-500吨": 14,
         "≥500吨": 5
       },
       "小苏打": {
-        "<10吨": 13,
+        "<10吨": 14,
         "10-30吨": 17,
-        "30-100吨": 412,
+        "30-100吨": 393,
         "100-500吨": 0,
         "≥500吨": 0
       }
@@ -947,7 +954,7 @@ const DATA = {
       85100.0,
       73171.0,
       105883.0,
-      48517.0
+      46658
     ],
     "尿素": [
       62428.0,
@@ -955,7 +962,7 @@ const DATA = {
       39906.0,
       72558.0,
       72094.0,
-      38023.0
+      37582
     ],
     "小苏打": [
       5837.0,
@@ -963,20 +970,1138 @@ const DATA = {
       36384.0,
       19436.0,
       36172.0,
-      14317.0
+      13707
     ]
   },
   "meta": {
     "date_range": "2026-03-01 ~ 2026-04-14",
-    "report_date": "2026年4月",
-    "phase2": {
-      "total_orders": 7202,
-      "matched": 5681,
-      "matched_pct": 78.9,
-      "unmatched_orders": 1521,
-      "unmatched_customers": 104,
-      "historical_agents": 36
-    }
+    "report_date": "2026年4月"
+  },
+  "customer_trend": {
+    "matrix_top30": [
+      {
+        "name": "重庆民丰化工有限责任公司",
+        "short": "重庆民丰化工有限责任公司",
+        "main_cat": "纯碱",
+        "series": [
+          12374.0,
+          7866.0,
+          5866.0,
+          6992.0,
+          5880.0,
+          10410.0
+        ],
+        "total": 49388.0
+      },
+      {
+        "name": "浙江杭实化工有限公司",
+        "short": "浙江杭实化工有限公司",
+        "main_cat": "纯碱",
+        "series": [
+          826.0,
+          13666.0,
+          8724.0,
+          12472.0,
+          0.0,
+          0.0
+        ],
+        "total": 35688.0
+      },
+      {
+        "name": "中农(天津)化肥有限公司",
+        "short": "中农(天津)化肥有限公司",
+        "main_cat": "尿素",
+        "series": [
+          3346.0,
+          6994.0,
+          6192.0,
+          1645.0,
+          14156.0,
+          2301.0
+        ],
+        "total": 34634.0
+      },
+      {
+        "name": "宁夏云海帆歌科技有限公司",
+        "short": "宁夏云海帆歌科技有限公司",
+        "main_cat": "纯碱",
+        "series": [
+          4178.0,
+          7612.0,
+          6737.0,
+          995.0,
+          9115.0,
+          68.0
+        ],
+        "total": 28705.0
+      },
+      {
+        "name": "广西新福兴硅科技有限公司",
+        "short": "广西新福兴硅科技有限公司",
+        "main_cat": "纯碱",
+        "series": [
+          0.0,
+          0.0,
+          0.0,
+          14121.0,
+          10205.0,
+          3836.0
+        ],
+        "total": 28162.0
+      },
+      {
+        "name": "内蒙古阜丰生物科技有限公司",
+        "short": "内蒙古阜丰生物科技有限公司",
+        "main_cat": "纯碱",
+        "series": [
+          0.0,
+          5970.0,
+          6480.0,
+          1403.0,
+          6537.0,
+          3114.0
+        ],
+        "total": 23504.0
+      },
+      {
+        "name": "湖北振华化学股份有限公司",
+        "short": "湖北振华化学股份有限公司",
+        "main_cat": "纯碱",
+        "series": [
+          4000.0,
+          6450.0,
+          8461.0,
+          4261.0,
+          0.0,
+          0.0
+        ],
+        "total": 23172.0
+      },
+      {
+        "name": "河北省农业生产资料集团有限公司",
+        "short": "河北省农业生产资料集团有限公司",
+        "main_cat": "尿素",
+        "series": [
+          5216.0,
+          2401.0,
+          3381.0,
+          2041.0,
+          6449.0,
+          2965.0
+        ],
+        "total": 22453.0
+      },
+      {
+        "name": "杭实国贸投资(杭州)有限公司",
+        "short": "杭实国贸投资(杭州)有限公司",
+        "main_cat": "纯碱",
+        "series": [
+          4110.0,
+          6502.0,
+          9120.0,
+          503.0,
+          1705.0,
+          0.0
+        ],
+        "total": 21940.0
+      },
+      {
+        "name": "山西东锦肥业有限公司",
+        "short": "山西东锦肥业有限公司",
+        "main_cat": "纯碱",
+        "series": [
+          1120.0,
+          5000.0,
+          4082.0,
+          2727.0,
+          5866.0,
+          315.0
+        ],
+        "total": 19110.0
+      },
+      {
+        "name": "宁夏日盛高新产业股份有限公司",
+        "short": "宁夏日盛高新产业股份有限公司",
+        "main_cat": "尿素",
+        "series": [
+          11837.0,
+          4198.0,
+          0.0,
+          2000.0,
+          0.0,
+          0.0
+        ],
+        "total": 18035.0
+      },
+      {
+        "name": "宁夏伊品生物科技股份有限公司",
+        "short": "宁夏伊品生物科技股份有限公司",
+        "main_cat": "纯碱",
+        "series": [
+          0.0,
+          0.0,
+          4364.0,
+          4994.0,
+          6005.0,
+          2465.0
+        ],
+        "total": 17828.0
+      },
+      {
+        "name": "浙江恒悦供应链管理有限公司",
+        "short": "浙江恒悦供应链管理有限公司",
+        "main_cat": "尿素",
+        "series": [
+          618.0,
+          3204.0,
+          5464.0,
+          4902.0,
+          1720.0,
+          688.0
+        ],
+        "total": 16596.0
+      },
+      {
+        "name": "石家庄农桥贸易有限公司",
+        "short": "石家庄农桥贸易有限公司",
+        "main_cat": "尿素",
+        "series": [
+          3929.0,
+          2359.0,
+          1031.0,
+          4233.0,
+          2253.0,
+          2306.0
+        ],
+        "total": 16111.0
+      },
+      {
+        "name": "大冶市华兴玻璃有限公司",
+        "short": "大冶市华兴玻璃有限公司",
+        "main_cat": "纯碱",
+        "series": [
+          4053.0,
+          4231.0,
+          4702.0,
+          2689.0,
+          0.0,
+          0.0
+        ],
+        "total": 15675.0
+      },
+      {
+        "name": "四川省天府粮仓化肥有限公司",
+        "short": "四川省天府粮仓化肥有限公司",
+        "main_cat": "纯碱",
+        "series": [
+          3681.0,
+          2349.0,
+          593.0,
+          668.0,
+          3342.0,
+          2709.0
+        ],
+        "total": 13342.0
+      },
+      {
+        "name": "中铝物资有限公司",
+        "short": "中铝物资有限公司",
+        "main_cat": "纯碱",
+        "series": [
+          0.0,
+          0.0,
+          170.0,
+          0.0,
+          6078.0,
+          6401.0
+        ],
+        "total": 12649.0
+      },
+      {
+        "name": "中煤西安设计工程有限责任公司",
+        "short": "中煤西安设计工程有限责任公司",
+        "main_cat": "纯碱",
+        "series": [
+          0.0,
+          2515.0,
+          3017.0,
+          3724.0,
+          2922.0,
+          0.0
+        ],
+        "total": 12178.0
+      },
+      {
+        "name": "广西德金新材料科技有限公司",
+        "short": "广西德金新材料科技有限公司",
+        "main_cat": "纯碱",
+        "series": [
+          0.0,
+          2673.0,
+          1377.0,
+          0.0,
+          4984.0,
+          2996.0
+        ],
+        "total": 12030.0
+      },
+      {
+        "name": "上海盐湖东信新材料科技有限公司",
+        "short": "上海盐湖东信新材料科技有限公司",
+        "main_cat": "纯碱",
+        "series": [
+          3444.0,
+          8556.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "total": 12000.0
+      },
+      {
+        "name": "成都市莱福特化工有限公司",
+        "short": "成都市莱福特化工有限公司",
+        "main_cat": "小苏打",
+        "series": [
+          0.0,
+          1300.0,
+          2566.0,
+          1479.0,
+          3897.0,
+          2464.0
+        ],
+        "total": 11706.0
+      },
+      {
+        "name": "浙江东方嘉信贸易发展有限公司",
+        "short": "浙江东方嘉信贸易发展有限公司",
+        "main_cat": "尿素",
+        "series": [
+          1942.0,
+          4875.0,
+          1423.0,
+          940.0,
+          1864.0,
+          0.0
+        ],
+        "total": 11044.0
+      },
+      {
+        "name": "河南郑铂新材料有限公司",
+        "short": "河南郑铂新材料有限公司",
+        "main_cat": "小苏打",
+        "series": [
+          0.0,
+          2616.0,
+          2657.0,
+          989.0,
+          3254.0,
+          809.0
+        ],
+        "total": 10325.0
+      },
+      {
+        "name": "惠多利农资有限公司",
+        "short": "惠多利农资有限公司",
+        "main_cat": "尿素",
+        "series": [
+          0.0,
+          1960.0,
+          1950.0,
+          4020.0,
+          1074.0,
+          664.0
+        ],
+        "total": 9668.0
+      },
+      {
+        "name": "山西国利天能科技有限公司",
+        "short": "山西国利天能科技有限公司",
+        "main_cat": "纯碱",
+        "series": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          6486.0,
+          2964.0
+        ],
+        "total": 9450.0
+      },
+      {
+        "name": "内蒙古蓝润科技有限公司",
+        "short": "内蒙古蓝润科技有限公司",
+        "main_cat": "尿素",
+        "series": [
+          1452.0,
+          934.0,
+          65.0,
+          4468.0,
+          914.0,
+          450.0
+        ],
+        "total": 8283.0
+      },
+      {
+        "name": "山西磊鑫化工股份有限公司",
+        "short": "山西磊鑫化工股份有限公司",
+        "main_cat": "纯碱",
+        "series": [
+          0.0,
+          0.0,
+          2710.0,
+          1207.0,
+          2798.0,
+          1354.0
+        ],
+        "total": 8069.0
+      },
+      {
+        "name": "海南维新国际供应链管理有限责任公司",
+        "short": "海南维新国际供应链管理有限责任…",
+        "main_cat": "纯碱",
+        "series": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          4264.0,
+          3195.0
+        ],
+        "total": 7459.0
+      },
+      {
+        "name": "新疆沈宏集团股份有限公司",
+        "short": "新疆沈宏集团股份有限公司",
+        "main_cat": "纯碱",
+        "series": [
+          0.0,
+          3085.0,
+          0.0,
+          3897.0,
+          0.0,
+          0.0
+        ],
+        "total": 6982.0
+      },
+      {
+        "name": "海南浩博农业开发有限公司",
+        "short": "海南浩博农业开发有限公司",
+        "main_cat": "尿素",
+        "series": [
+          0.0,
+          0.0,
+          68.0,
+          0.0,
+          3835.0,
+          2765.0
+        ],
+        "total": 6668.0
+      }
+    ],
+    "up_3v2": [
+      {
+        "name": "中农(天津)化肥有限公司",
+        "short": "中农(天津)化肥有限公司",
+        "cat": "尿素",
+        "prev": 1645.0,
+        "curr": 14156.0,
+        "delta": 12511.0,
+        "pct": 760.5
+      },
+      {
+        "name": "宁夏云海帆歌科技有限公司",
+        "short": "宁夏云海帆歌科技有限公司",
+        "cat": "纯碱",
+        "prev": 995.0,
+        "curr": 9115.0,
+        "delta": 8120.0,
+        "pct": 816.1
+      },
+      {
+        "name": "山西国利天能科技有限公司",
+        "short": "山西国利天能科技有限公司",
+        "cat": "纯碱",
+        "prev": 0.0,
+        "curr": 6486.0,
+        "delta": 6486.0,
+        "pct": null
+      },
+      {
+        "name": "中铝物资有限公司",
+        "short": "中铝物资有限公司",
+        "cat": "纯碱",
+        "prev": 0.0,
+        "curr": 6078.0,
+        "delta": 6078.0,
+        "pct": null
+      },
+      {
+        "name": "内蒙古阜丰生物科技有限公司",
+        "short": "内蒙古阜丰生物科技有限公司",
+        "cat": "纯碱",
+        "prev": 1403.0,
+        "curr": 6537.0,
+        "delta": 5134.0,
+        "pct": 365.9
+      },
+      {
+        "name": "广西德金新材料科技有限公司",
+        "short": "广西德金新材料科技有限公司",
+        "cat": "纯碱",
+        "prev": 0.0,
+        "curr": 4984.0,
+        "delta": 4984.0,
+        "pct": null
+      },
+      {
+        "name": "河北省农业生产资料集团有限公司",
+        "short": "河北省农业生产资料集团有限公司",
+        "cat": "尿素",
+        "prev": 2041.0,
+        "curr": 6449.0,
+        "delta": 4408.0,
+        "pct": 216.0
+      },
+      {
+        "name": "宁波中基汇程资源有限公司",
+        "short": "宁波中基汇程资源有限公司",
+        "cat": "尿素",
+        "prev": 0.0,
+        "curr": 4350.0,
+        "delta": 4350.0,
+        "pct": null
+      },
+      {
+        "name": "海南维新国际供应链管理有限责任公司",
+        "short": "海南维新国际供应链管理有限责任…",
+        "cat": "纯碱",
+        "prev": 0.0,
+        "curr": 4264.0,
+        "delta": 4264.0,
+        "pct": null
+      },
+      {
+        "name": "海南浩博农业开发有限公司",
+        "short": "海南浩博农业开发有限公司",
+        "cat": "尿素",
+        "prev": 0.0,
+        "curr": 3835.0,
+        "delta": 3835.0,
+        "pct": null
+      }
+    ],
+    "dn_3v2": [
+      {
+        "name": "浙江杭实化工有限公司",
+        "short": "浙江杭实化工有限公司",
+        "cat": "纯碱",
+        "prev": 12472.0,
+        "curr": 0.0,
+        "delta": -12472.0,
+        "pct": -100.0
+      },
+      {
+        "name": "沭阳县宜美木业制品厂",
+        "short": "沭阳县宜美木业制品厂",
+        "cat": "尿素",
+        "prev": 4740.0,
+        "curr": 0.0,
+        "delta": -4740.0,
+        "pct": -100.0
+      },
+      {
+        "name": "湖北振华化学股份有限公司",
+        "short": "湖北振华化学股份有限公司",
+        "cat": "纯碱",
+        "prev": 4261.0,
+        "curr": 0.0,
+        "delta": -4261.0,
+        "pct": -100.0
+      },
+      {
+        "name": "广西新福兴硅科技有限公司",
+        "short": "广西新福兴硅科技有限公司",
+        "cat": "纯碱",
+        "prev": 14121.0,
+        "curr": 10205.0,
+        "delta": -3916.0,
+        "pct": -27.7
+      },
+      {
+        "name": "新疆沈宏集团股份有限公司",
+        "short": "新疆沈宏集团股份有限公司",
+        "cat": "纯碱",
+        "prev": 3897.0,
+        "curr": 0.0,
+        "delta": -3897.0,
+        "pct": -100.0
+      },
+      {
+        "name": "内蒙古蓝润科技有限公司",
+        "short": "内蒙古蓝润科技有限公司",
+        "cat": "尿素",
+        "prev": 4468.0,
+        "curr": 914.0,
+        "delta": -3554.0,
+        "pct": -79.5
+      },
+      {
+        "name": "浙江恒悦供应链管理有限公司",
+        "short": "浙江恒悦供应链管理有限公司",
+        "cat": "尿素",
+        "prev": 4902.0,
+        "curr": 1720.0,
+        "delta": -3182.0,
+        "pct": -64.9
+      },
+      {
+        "name": "惠多利农资有限公司",
+        "short": "惠多利农资有限公司",
+        "cat": "尿素",
+        "prev": 4020.0,
+        "curr": 1074.0,
+        "delta": -2946.0,
+        "pct": -73.3
+      },
+      {
+        "name": "大冶市华兴玻璃有限公司",
+        "short": "大冶市华兴玻璃有限公司",
+        "cat": "纯碱",
+        "prev": 2689.0,
+        "curr": 0.0,
+        "delta": -2689.0,
+        "pct": -100.0
+      },
+      {
+        "name": "宿迁新乐木业有限公司",
+        "short": "宿迁新乐木业有限公司",
+        "cat": "尿素",
+        "prev": 3262.0,
+        "curr": 699.0,
+        "delta": -2563.0,
+        "pct": -78.6
+      }
+    ],
+    "up_4v3h": [
+      {
+        "name": "重庆民丰化工有限责任公司",
+        "short": "重庆民丰化工有限责任公司",
+        "cat": "纯碱",
+        "prev": 4174.0,
+        "curr": 10410.0,
+        "delta": 6236.0,
+        "pct": 149.4
+      },
+      {
+        "name": "中铝物资有限公司",
+        "short": "中铝物资有限公司",
+        "cat": "纯碱",
+        "prev": 3541.0,
+        "curr": 6401.0,
+        "delta": 2860.0,
+        "pct": 80.8
+      },
+      {
+        "name": "山西国利天能科技有限公司",
+        "short": "山西国利天能科技有限公司",
+        "cat": "纯碱",
+        "prev": 559.0,
+        "curr": 2964.0,
+        "delta": 2405.0,
+        "pct": 430.2
+      },
+      {
+        "name": "四川省天府粮仓化肥有限公司",
+        "short": "四川省天府粮仓化肥有限公司",
+        "cat": "纯碱",
+        "prev": 344.0,
+        "curr": 2709.0,
+        "delta": 2365.0,
+        "pct": 687.5
+      },
+      {
+        "name": "海南浩博农业开发有限公司",
+        "short": "海南浩博农业开发有限公司",
+        "cat": "尿素",
+        "prev": 418.0,
+        "curr": 2765.0,
+        "delta": 2347.0,
+        "pct": 561.5
+      },
+      {
+        "name": "鄂尔多斯市锦融农牧业有限公司",
+        "short": "鄂尔多斯市锦融农牧业有限公司",
+        "cat": "尿素",
+        "prev": 0.0,
+        "curr": 2068.0,
+        "delta": 2068.0,
+        "pct": null
+      },
+      {
+        "name": "广西新福兴硅科技有限公司",
+        "short": "广西新福兴硅科技有限公司",
+        "cat": "纯碱",
+        "prev": 1917.0,
+        "curr": 3836.0,
+        "delta": 1919.0,
+        "pct": 100.1
+      },
+      {
+        "name": "四川一泓益发科技有限公司",
+        "short": "四川一泓益发科技有限公司",
+        "cat": "纯碱",
+        "prev": 0.0,
+        "curr": 1300.0,
+        "delta": 1300.0,
+        "pct": null
+      },
+      {
+        "name": "海南维新国际供应链管理有限责任公司",
+        "short": "海南维新国际供应链管理有限责任…",
+        "cat": "纯碱",
+        "prev": 1932.0,
+        "curr": 3195.0,
+        "delta": 1263.0,
+        "pct": 65.4
+      },
+      {
+        "name": "天津忠民农资有限公司",
+        "short": "天津忠民农资有限公司",
+        "cat": "尿素",
+        "prev": 0.0,
+        "curr": 1116.0,
+        "delta": 1116.0,
+        "pct": null
+      }
+    ],
+    "dn_4v3h": [
+      {
+        "name": "宁夏云海帆歌科技有限公司",
+        "short": "宁夏云海帆歌科技有限公司",
+        "cat": "纯碱",
+        "prev": 8177.0,
+        "curr": 68.0,
+        "delta": -8109.0,
+        "pct": -99.2
+      },
+      {
+        "name": "中农(内蒙古)农资有限公司",
+        "short": "中农(内蒙古)农资有限公司",
+        "cat": "尿素",
+        "prev": 3407.0,
+        "curr": 349.0,
+        "delta": -3058.0,
+        "pct": -89.8
+      },
+      {
+        "name": "中农(天津)化肥有限公司",
+        "short": "中农(天津)化肥有限公司",
+        "cat": "尿素",
+        "prev": 5287.0,
+        "curr": 2301.0,
+        "delta": -2986.0,
+        "pct": -56.5
+      },
+      {
+        "name": "河北省农业生产资料集团有限公司",
+        "short": "河北省农业生产资料集团有限公司",
+        "cat": "尿素",
+        "prev": 5620.0,
+        "curr": 2965.0,
+        "delta": -2655.0,
+        "pct": -47.2
+      },
+      {
+        "name": "山西东锦肥业有限公司",
+        "short": "山西东锦肥业有限公司",
+        "cat": "纯碱",
+        "prev": 2797.0,
+        "curr": 315.0,
+        "delta": -2482.0,
+        "pct": -88.7
+      },
+      {
+        "name": "成都辉太化工产品有限公司",
+        "short": "成都辉太化工产品有限公司",
+        "cat": "纯碱",
+        "prev": 1792.0,
+        "curr": 0.0,
+        "delta": -1792.0,
+        "pct": -100.0
+      },
+      {
+        "name": "杭实国贸投资(杭州)有限公司",
+        "short": "杭实国贸投资(杭州)有限公司",
+        "cat": "纯碱",
+        "prev": 1705.0,
+        "curr": 0.0,
+        "delta": -1705.0,
+        "pct": -100.0
+      },
+      {
+        "name": "广州川鹏新材料有限公司",
+        "short": "广州川鹏新材料有限公司",
+        "cat": "纯碱",
+        "prev": 3220.0,
+        "curr": 1736.0,
+        "delta": -1484.0,
+        "pct": -46.1
+      },
+      {
+        "name": "浙江东方嘉信贸易发展有限公司",
+        "short": "浙江东方嘉信贸易发展有限公司",
+        "cat": "尿素",
+        "prev": 1482.0,
+        "curr": 0.0,
+        "delta": -1482.0,
+        "pct": -100.0
+      },
+      {
+        "name": "中农工贸有限责任公司",
+        "short": "中农工贸有限责任公司",
+        "cat": "尿素",
+        "prev": 1633.0,
+        "curr": 174.0,
+        "delta": -1459.0,
+        "pct": -89.3
+      }
+    ],
+    "new_cust": [
+      {
+        "name": "山西国利天能科技有限公司",
+        "short": "山西国利天能科技有限公司",
+        "cat": "纯碱",
+        "q2": 0.0,
+        "q3": 6486.0,
+        "q4": 2964.0
+      },
+      {
+        "name": "中铝物资有限公司",
+        "short": "中铝物资有限公司",
+        "cat": "纯碱",
+        "q2": 0.0,
+        "q3": 6078.0,
+        "q4": 6401.0
+      },
+      {
+        "name": "广西德金新材料科技有限公司",
+        "short": "广西德金新材料科技有限公司",
+        "cat": "纯碱",
+        "q2": 0.0,
+        "q3": 4984.0,
+        "q4": 2996.0
+      },
+      {
+        "name": "宁波中基汇程资源有限公司",
+        "short": "宁波中基汇程资源有限公司",
+        "cat": "尿素",
+        "q2": 0.0,
+        "q3": 4350.0,
+        "q4": 575.0
+      },
+      {
+        "name": "海南维新国际供应链管理有限责任公司",
+        "short": "海南维新国际供应链管理有限责任…",
+        "cat": "纯碱",
+        "q2": 0.0,
+        "q3": 4264.0,
+        "q4": 3195.0
+      },
+      {
+        "name": "海南浩博农业开发有限公司",
+        "short": "海南浩博农业开发有限公司",
+        "cat": "尿素",
+        "q2": 0.0,
+        "q3": 3835.0,
+        "q4": 2765.0
+      },
+      {
+        "name": "余姚市环恒化工原料有限公司",
+        "short": "余姚市环恒化工原料有限公司",
+        "cat": "纯碱",
+        "q2": 0.0,
+        "q3": 3299.0,
+        "q4": 0.0
+      },
+      {
+        "name": "广州川鹏新材料有限公司",
+        "short": "广州川鹏新材料有限公司",
+        "cat": "纯碱",
+        "q2": 0.0,
+        "q3": 3276.0,
+        "q4": 1736.0
+      },
+      {
+        "name": "陕西神木瑞诚玻璃有限公司",
+        "short": "陕西神木瑞诚玻璃有限公司",
+        "cat": "纯碱",
+        "q2": 0.0,
+        "q3": 3000.0,
+        "q4": 0.0
+      },
+      {
+        "name": "山西常晟贸易有限公司",
+        "short": "山西常晟贸易有限公司",
+        "cat": "纯碱",
+        "q2": 0.0,
+        "q3": 2621.0,
+        "q4": 352.0
+      },
+      {
+        "name": "宝鸡市育才玻璃制瓶有限公司",
+        "short": "宝鸡市育才玻璃制瓶有限公司",
+        "cat": "纯碱",
+        "q2": 0.0,
+        "q3": 1944.0,
+        "q4": 0.0
+      },
+      {
+        "name": "天津明宏广源科技有限公司",
+        "short": "天津明宏广源科技有限公司",
+        "cat": "小苏打",
+        "q2": 0.0,
+        "q3": 1837.0,
+        "q4": 748.0
+      },
+      {
+        "name": "山东光烨釉料科技有限公司",
+        "short": "山东光烨釉料科技有限公司",
+        "cat": "小苏打",
+        "q2": 0.0,
+        "q3": 1735.0,
+        "q4": 476.0
+      },
+      {
+        "name": "北京施必胜农业科技有限公司",
+        "short": "北京施必胜农业科技有限公司",
+        "cat": "尿素",
+        "q2": 0.0,
+        "q3": 1495.0,
+        "q4": 5.0
+      },
+      {
+        "name": "乌兰察布市天宇农业生产资料有限责任公司",
+        "short": "乌兰察布市天宇农业生产资料有限…",
+        "cat": "尿素",
+        "q2": 0.0,
+        "q3": 1360.0,
+        "q4": 308.0
+      },
+      {
+        "name": "山西亿蓝海工贸有限公司",
+        "short": "山西亿蓝海工贸有限公司",
+        "cat": "尿素",
+        "q2": 0.0,
+        "q3": 1347.0,
+        "q4": 210.0
+      },
+      {
+        "name": "北京市丰硕达农业生产资料有限责任公司",
+        "short": "北京市丰硕达农业生产资料有限责…",
+        "cat": "尿素",
+        "q2": 0.0,
+        "q3": 1310.0,
+        "q4": 0.0
+      },
+      {
+        "name": "鄂托克旗家家友螺旋藻农民专业合作社",
+        "short": "鄂托克旗家家友螺旋藻农民专业合…",
+        "cat": "小苏打",
+        "q2": 0.0,
+        "q3": 1161.0,
+        "q4": 378.0
+      },
+      {
+        "name": "山西省交城县华岳玻璃有限公司",
+        "short": "山西省交城县华岳玻璃有限公司",
+        "cat": "纯碱",
+        "q2": 0.0,
+        "q3": 980.0,
+        "q4": 102.0
+      },
+      {
+        "name": "达拉特旗藻尚好水产养殖有限公司",
+        "short": "达拉特旗藻尚好水产养殖有限公司",
+        "cat": "小苏打",
+        "q2": 0.0,
+        "q3": 908.0,
+        "q4": 100.0
+      }
+    ],
+    "lost_cust": [
+      {
+        "name": "浙江杭实化工有限公司",
+        "short": "浙江杭实化工有限公司",
+        "cat": "纯碱",
+        "q2": 12472.0,
+        "q3": 0.0,
+        "q4": 0.0
+      },
+      {
+        "name": "沭阳县宜美木业制品厂",
+        "short": "沭阳县宜美木业制品厂",
+        "cat": "尿素",
+        "q2": 4740.0,
+        "q3": 0.0,
+        "q4": 0.0
+      },
+      {
+        "name": "湖北振华化学股份有限公司",
+        "short": "湖北振华化学股份有限公司",
+        "cat": "纯碱",
+        "q2": 4261.0,
+        "q3": 0.0,
+        "q4": 0.0
+      },
+      {
+        "name": "新疆沈宏集团股份有限公司",
+        "short": "新疆沈宏集团股份有限公司",
+        "cat": "纯碱",
+        "q2": 3897.0,
+        "q3": 0.0,
+        "q4": 0.0
+      },
+      {
+        "name": "大冶市华兴玻璃有限公司",
+        "short": "大冶市华兴玻璃有限公司",
+        "cat": "纯碱",
+        "q2": 2689.0,
+        "q3": 0.0,
+        "q4": 0.0
+      },
+      {
+        "name": "中农集团控股四川农资有限公司",
+        "short": "中农集团控股四川农资有限公司",
+        "cat": "尿素",
+        "q2": 2432.0,
+        "q3": 0.0,
+        "q4": 820.0
+      },
+      {
+        "name": "宁夏日盛高新产业股份有限公司",
+        "short": "宁夏日盛高新产业股份有限公司",
+        "cat": "尿素",
+        "q2": 2000.0,
+        "q3": 0.0,
+        "q4": 0.0
+      },
+      {
+        "name": "肥多多熔盐科技(海南)有限公司",
+        "short": "肥多多熔盐科技(海南)有限公司",
+        "cat": "纯碱",
+        "q2": 1718.0,
+        "q3": 0.0,
+        "q4": 105.0
+      },
+      {
+        "name": "黄骅市铁流商贸有限公司",
+        "short": "黄骅市铁流商贸有限公司",
+        "cat": "尿素",
+        "q2": 1700.0,
+        "q3": 0.0,
+        "q4": 0.0
+      },
+      {
+        "name": "沭阳县泽之源木业有限公司",
+        "short": "沭阳县泽之源木业有限公司",
+        "cat": "尿素",
+        "q2": 1274.0,
+        "q3": 0.0,
+        "q4": 0.0
+      },
+      {
+        "name": "山东瑞星臻选网络科技有限公司",
+        "short": "山东瑞星臻选网络科技有限公司",
+        "cat": "尿素",
+        "q2": 1050.0,
+        "q3": 0.0,
+        "q4": 0.0
+      },
+      {
+        "name": "河北中昊利铭环保科技有限公司",
+        "short": "河北中昊利铭环保科技有限公司",
+        "cat": "尿素",
+        "q2": 871.0,
+        "q3": 0.0,
+        "q4": 0.0
+      },
+      {
+        "name": "成都鑫瑞隆化工有限公司",
+        "short": "成都鑫瑞隆化工有限公司",
+        "cat": "小苏打",
+        "q2": 742.0,
+        "q3": 0.0,
+        "q4": 0.0
+      },
+      {
+        "name": "内蒙古鑫远工贸有限公司",
+        "short": "内蒙古鑫远工贸有限公司",
+        "cat": "尿素",
+        "q2": 582.0,
+        "q3": 0.0,
+        "q4": 0.0
+      },
+      {
+        "name": "昌吉吉盛新型建材有限公司",
+        "short": "昌吉吉盛新型建材有限公司",
+        "cat": "小苏打",
+        "q2": 573.0,
+        "q3": 0.0,
+        "q4": 334.0
+      },
+      {
+        "name": "宁夏百方吉化工有限公司",
+        "short": "宁夏百方吉化工有限公司",
+        "cat": "纯碱",
+        "q2": 551.0,
+        "q3": 0.0,
+        "q4": 0.0
+      },
+      {
+        "name": "山东初禾农业科技有限公司",
+        "short": "山东初禾农业科技有限公司",
+        "cat": "尿素",
+        "q2": 526.0,
+        "q3": 0.0,
+        "q4": 700.0
+      },
+      {
+        "name": "任丘市冀化农业有限公司",
+        "short": "任丘市冀化农业有限公司",
+        "cat": "尿素",
+        "q2": 525.0,
+        "q3": 0.0,
+        "q4": 0.0
+      },
+      {
+        "name": "四川米科化工有限公司",
+        "short": "四川米科化工有限公司",
+        "cat": "纯碱",
+        "q2": 502.0,
+        "q3": 0.0,
+        "q4": 0.0
+      },
+      {
+        "name": "营口普惠贸易有限公司",
+        "short": "营口普惠贸易有限公司",
+        "cat": "尿素",
+        "q2": 493.0,
+        "q3": 0.0,
+        "q4": 0.0
+      }
+    ],
+    "new_cust_total": 132,
+    "lost_cust_total": 48,
+    "months": [
+      "11月",
+      "12月",
+      "1月",
+      "2月",
+      "3月",
+      "4月半"
+    ]
   }
 };
 
@@ -1025,7 +2150,6 @@ document.querySelectorAll('.tab').forEach(tab => {
 function renderKPI(containerId, data, accent) {
   const c = document.getElementById(containerId);
   const kpis = [
-    { label: '订单数', value: data.n_orders.toLocaleString(), unit: '单' },
     { label: '发货吨数', value: data.total_qty.toLocaleString(), unit: '吨' },
     { label: '出库金额', value: data.total_amt_wan.toLocaleString(), unit: '万元' },
     { label: '合作单位', value: data.n_customers.toLocaleString(), unit: '家' },
@@ -1210,7 +2334,7 @@ function renderTopCust(containerId, data) {
       textStyle: { fontFamily: FONT, fontSize: mobile ? 12 : 13 },
       formatter: p => {
         const d = sorted[p[0].dataIndex];
-        return `<b>${d.name}</b><br/>品类：${d.cat}<br/>订单数：${d.orders.toLocaleString()}<br/>吨数：${d.qty.toLocaleString()} 吨<br/>金额：<b>${d.amt_wan.toLocaleString()} 万</b>`;
+        return `<b>${d.name}</b><br/>品类：${d.cat}<br/>吨数：${d.qty.toLocaleString()} 吨<br/>金额：<b>${d.amt_wan.toLocaleString()} 万</b>`;
       }
     },
     grid: mobile
@@ -1417,7 +2541,7 @@ function renderOrderSize(containerId, data) {
     legend: { bottom: 0, textStyle: { fontFamily: FONT, fontSize: 11 } },
     grid: { left: 40, right: 30, top: 20, bottom: 50 },
     xAxis: { type: 'category', data: cats, axisLabel: { fontFamily: FONT, fontSize: 12, fontWeight: 700 } },
-    yAxis: { type: 'value', name: '订单数', axisLabel: { fontFamily: FONT } },
+    yAxis: { type: 'value', name: '发货单数', axisLabel: { fontFamily: FONT } },
     series: series
   });
   registerChart(chart);
@@ -1511,6 +2635,167 @@ function renderTrendStack(containerId, trend) {
   registerChart(chart);
 }
 
+// ============ 客户动向 · 热力矩阵 ============
+function renderCustMatrix(containerId, data) {
+  const chart = echarts.init(document.getElementById(containerId));
+  const mobile = IS_MOBILE();
+  const months = data.months; // ['11月', '12月', ...]
+  const cust = data.matrix_top30.map(r => r.short);
+  // 数据 [xIdx, yIdx, value]
+  const cells = [];
+  let maxV = 0;
+  data.matrix_top30.forEach((r, yi) => {
+    r.series.forEach((v, xi) => {
+      cells.push([xi, cust.length - 1 - yi, v]); // 反向Y让Top1在顶部
+      if (v > maxV) maxV = v;
+    });
+  });
+  chart.setOption({
+    tooltip: {
+      position: 'top',
+      formatter: p => {
+        const m = months[p.value[0]];
+        const c = cust[cust.length - 1 - p.value[1]];
+        return `<b>${c}</b><br/>${m}: ${p.value[2].toLocaleString()} 吨`;
+      },
+      textStyle: { fontFamily: FONT, fontSize: mobile ? 11 : 13 }
+    },
+    grid: mobile
+      ? { left: 100, right: 10, top: 30, bottom: 30 }
+      : { left: 160, right: 40, top: 40, bottom: 40 },
+    xAxis: {
+      type: 'category',
+      data: months,
+      position: 'top',
+      axisLabel: { fontFamily: FONT, fontSize: mobile ? 10 : 12, fontWeight: 700, color: '#1E2761' },
+      splitArea: { show: true }
+    },
+    yAxis: {
+      type: 'category',
+      data: cust.slice().reverse(),
+      axisLabel: {
+        fontFamily: FONT,
+        fontSize: mobile ? 9 : 11,
+        fontWeight: 600,
+        formatter: v => mobile ? (v.length > 8 ? v.slice(0,7)+'…' : v) : v
+      }
+    },
+    visualMap: {
+      min: 0, max: maxV, calculable: false, orient: 'horizontal',
+      left: 'center', bottom: 0, show: !mobile,
+      inRange: { color: ['#f4f7fb', '#CADCFC', '#2E3C7E', '#1E2761'] },
+      textStyle: { fontFamily: FONT, fontSize: 10 }
+    },
+    series: [{
+      name: '吨数',
+      type: 'heatmap',
+      data: cells,
+      label: {
+        show: !mobile,
+        formatter: p => p.value[2] ? (p.value[2] >= 1000 ? (p.value[2]/1000).toFixed(1)+'k' : p.value[2]) : '',
+        fontSize: 10, fontFamily: FONT,
+        color: p => p.value[2] > maxV * 0.5 ? '#fff' : '#1E2761'
+      }
+    }]
+  });
+  registerChart(chart);
+}
+
+// ============ 客户动向 · 增减 TOP 10 横条 ============
+function renderGrowBar(containerId, list, isUp) {
+  const chart = echarts.init(document.getElementById(containerId));
+  const mobile = IS_MOBILE();
+  const data = list.slice().reverse(); // echarts 横向bar Y从下到上，所以反转
+  const color = isUp ? '#2e7d32' : '#c62828';
+  chart.setOption({
+    tooltip: {
+      trigger: 'axis', axisPointer: { type: 'shadow' },
+      textStyle: { fontFamily: FONT, fontSize: mobile ? 11 : 13 },
+      formatter: p => {
+        const d = data[p[0].dataIndex];
+        const pct = d.pct === null ? (isUp ? '新增' : '-100%') : (d.pct > 0 ? '+' : '') + d.pct + '%';
+        return `<b>${d.name}</b><br/>品类：${d.cat}<br/>上期：${d.prev.toLocaleString()} 吨<br/>本期：${d.curr.toLocaleString()} 吨<br/>变化：<b>${(d.delta > 0 ? '+' : '') + d.delta.toLocaleString()} 吨</b>（${pct}）`;
+      }
+    },
+    grid: mobile ? { left: 4, right: 12, top: 8, bottom: 6, containLabel: true } : { left: 140, right: 60, top: 10, bottom: 20 },
+    xAxis: {
+      type: 'value',
+      axisLabel: { fontFamily: FONT, fontSize: mobile ? 10 : 11, formatter: v => Math.abs(v).toLocaleString() }
+    },
+    yAxis: {
+      type: 'category',
+      data: data.map(d => mobile ? d.short : d.name),
+      axisLabel: { fontFamily: FONT, fontSize: mobile ? 10 : 11, fontWeight: 600 },
+      axisTick: { show: false }
+    },
+    series: [{
+      name: '变化量',
+      type: 'bar',
+      data: data.map(d => ({
+        value: Math.abs(d.delta),
+        itemStyle: { color }
+      })),
+      barWidth: '62%',
+      label: {
+        show: true,
+        position: mobile ? 'insideRight' : 'right',
+        formatter: p => {
+          const d = data[p.dataIndex];
+          const pct = d.pct === null ? (isUp ? '新增' : '流失') : (d.pct > 0 ? '+' : '') + d.pct + '%';
+          return mobile
+            ? `${Math.abs(d.delta).toLocaleString()}`
+            : `${(d.delta > 0 ? '+' : '') + d.delta.toLocaleString()}  (${pct})`;
+        },
+        color: mobile ? '#fff' : color,
+        fontFamily: FONT, fontSize: mobile ? 10 : 11, fontWeight: 700
+      }
+    }]
+  });
+  registerChart(chart);
+}
+
+// ============ 客户动向 · 新客/流失客户 ============
+function renderCustList(containerId, list, isNew) {
+  const chart = echarts.init(document.getElementById(containerId));
+  const mobile = IS_MOBILE();
+  const data = list.slice().reverse();
+  const color = isNew ? '#2e7d32' : '#c62828';
+  const valueKey = isNew ? 'q3' : 'q2';
+  chart.setOption({
+    tooltip: {
+      trigger: 'axis', axisPointer: { type: 'shadow' },
+      textStyle: { fontFamily: FONT, fontSize: mobile ? 11 : 13 },
+      formatter: p => {
+        const d = data[p[0].dataIndex];
+        return `<b>${d.name}</b><br/>品类：${d.cat}<br/>2月：${d.q2.toLocaleString()} 吨<br/>3月：${d.q3.toLocaleString()} 吨<br/>4月(半月)：${d.q4.toLocaleString()} 吨`;
+      }
+    },
+    grid: mobile ? { left: 4, right: 12, top: 8, bottom: 6, containLabel: true } : { left: 140, right: 50, top: 10, bottom: 20 },
+    xAxis: {
+      type: 'value',
+      axisLabel: { fontFamily: FONT, fontSize: mobile ? 10 : 11, formatter: v => v.toLocaleString() }
+    },
+    yAxis: {
+      type: 'category',
+      data: data.map(d => mobile ? d.short : d.name),
+      axisLabel: { fontFamily: FONT, fontSize: mobile ? 10 : 11, fontWeight: 600 },
+      axisTick: { show: false }
+    },
+    series: [{
+      type: 'bar',
+      data: data.map(d => ({ value: d[valueKey], itemStyle: { color } })),
+      barWidth: '62%',
+      label: {
+        show: true, position: mobile ? 'insideRight' : 'right',
+        formatter: p => data[p.dataIndex][valueKey].toLocaleString() + ' 吨',
+        color: mobile ? '#fff' : color,
+        fontFamily: FONT, fontSize: mobile ? 10 : 11, fontWeight: 700
+      }
+    }]
+  });
+  registerChart(chart);
+}
+
 // ============ Init ============
 function renderAll() {
   disposeAllCharts();
@@ -1521,7 +2806,6 @@ function renderAll() {
   renderCatPerf('march-cat-perf', DATA.march.by_cat);
   renderTopCust('march-top-cust', DATA.march.top_cust);
   renderRegion('march-region', DATA.march.regions);
-  renderPrice('march-price', DATA.march.price);
   renderOrderSize('march-size', DATA.march.size_dist);
 
   renderKPI('april-kpi', DATA.april.kpi, 'orange');
@@ -1531,11 +2815,25 @@ function renderAll() {
   renderCatPerf('april-cat-perf', DATA.april.by_cat);
   renderTopCust('april-top-cust', DATA.april.top_cust);
   renderRegion('april-region', DATA.april.regions);
-  renderPrice('april-price', DATA.april.price);
   renderOrderSize('april-size', DATA.april.size_dist);
 
   renderTrendLine('trend-line', DATA.trend);
   renderTrendStack('trend-stack', DATA.trend);
+
+  // 客户动向
+  const ct = DATA.customer_trend;
+  renderCustMatrix('cust-matrix', ct);
+  renderGrowBar('cust-up-3v2', ct.up_3v2, true);
+  renderGrowBar('cust-dn-3v2', ct.dn_3v2, false);
+  renderGrowBar('cust-up-4v3h', ct.up_4v3h, true);
+  renderGrowBar('cust-dn-4v3h', ct.dn_4v3h, false);
+  renderCustList('cust-new', ct.new_cust, true);
+  renderCustList('cust-lost', ct.lost_cust, false);
+
+  const newSub = document.getElementById('new-cust-sub');
+  if (newSub) newSub.textContent = `3月 ≥ 30 吨 且 2月 = 0 · 共 ${ct.new_cust_total} 家 · 显示 TOP ${ct.new_cust.length}`;
+  const lostSub = document.getElementById('lost-cust-sub');
+  if (lostSub) lostSub.textContent = `2月 ≥ 100 吨 且 3月 = 0 · 共 ${ct.lost_cust_total} 家 · 显示 TOP ${ct.lost_cust.length}`;
 }
 renderAll();
 
